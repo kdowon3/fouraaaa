@@ -39,3 +39,15 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# 가상 환경(venv) 폴더 무시
+backend/venv
+
+# Firebase 서비스 계정 키 파일 무시
+backend/service-account.json
+
+# Pycache, 로그 파일 등 무시
+backend/__pycache__/
+backend/*.pyc
+backend/*.pyo
+backend/*.log
