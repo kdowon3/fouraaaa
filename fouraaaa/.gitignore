@@ -45,6 +45,7 @@ backend/venv
 
 # Firebase 서비스 계정 키 파일 무시
 backend/service-account.json
+config/firebase.js
 
 # Pycache, 로그 파일 등 무시
 backend/__pycache__/
