@@ -6,7 +6,8 @@
 }
 
 .container {
-    width: 402px;
+    width: 100%;
+    max-width: 430px;
     background-color: white;
     justify-self: center;
   }

@@ -10,62 +10,74 @@ const GNBContainer = styled.header`
 `;
 
 const Navbar = styled.nav`
-  display: block;
-  align-items: center;
-  justify-content: space-between;
+  display: flex;
+  flex-direction: column;
   font-size: 14px;
-  font-family: 'Pretendard';  
+  font-family: 'Pretendard';
 `;
+
 const Upsection = styled.div`
   display: flex;
-  padding: 15px 0px;
-  margin-left: 0px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 15px 0;
 `;
+
 const StyledLogo = styled(Image)`
-  width: 79px; /* 원하는 크기로 조절 */
+  width: 79px; /* 기존 로고 크기 유지 */
   height: 25px;
 `;
+
+const IconWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;         /* 아이콘 사이 간격 */
+  flex-shrink: 0;
+  margin-right: 5%;  /* 오른쪽 끝 여백: NavLinks와 동일하게 */
+`;
+
 const ShoppingCart = styled(Image)`
   width: 24px;
   height: 24px;
-  margin-left: 217px;
 `;
+
 const MyPage = styled(Image)`
   width: 24px;
   height: 24px;
-  margin-left: 20px;
 `;
+
 const NavLinks = styled.div`
   display: flex;
   align-items: center;
   gap: 12px;
 `;
 
+// Divider들의 width를 % 단위로 변경 (약 4.5%, 7%, 14.7%, 22.8%)
 const Divider1 = styled.div`
-  width: 19px;
+  width: 6.5%;
   height: 30px;
   background-color: #2C3264;
 `;
 const Divider2 = styled.div`
-  width: 30px;
+  width: 9.5%;
   height: 30px;
   background-color: #2C3264;
 `;
 const Divider3 = styled.div`
-  width: 63px;
+  width: 17.2%;
   height: 30px;
   background-color: #2C3264;
 `;
 const Divider4 = styled.div`
-  width: 98px;
+  width: 25.3%;
   height: 30px;
   background-color: #2C3264;
 `;
+
 const StyledLink = styled(Link)`
   font-size: 14px;
   color: #000000;
   text-decoration: none;
-
   &:hover {
     color: #0070f3;
   }
@@ -77,12 +89,24 @@ export default function HomeNav() {
       <Navbar>
         <Upsection>
           <StyledLogo src="/images/logo.png" alt="Logo" width={79} height={25} />
-          <Link href="/">
-            <ShoppingCart src="/images/shoppingcart.png" alt="장바구니" width={24} height={24} />
-          </Link>
-          <Link href="/">
-            <MyPage src="/images/mypage.png" alt="마이페이지" width={24} height={24} />
-          </Link>
+          <IconWrapper>
+            <Link href="/">
+              <ShoppingCart
+                src="/images/shoppingcart.png"
+                alt="장바구니"
+                width={24}
+                height={24}
+              />
+            </Link>
+            <Link href="/">
+              <MyPage
+                src="/images/mypage.png"
+                alt="마이페이지"
+                width={30}
+                height={30}
+              />
+            </Link>
+          </IconWrapper>
         </Upsection>
         <NavLinks>
           <Divider1 />
