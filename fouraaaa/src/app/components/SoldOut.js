@@ -34,7 +34,6 @@ const Arrow = styled(Image)`
   width: 3.3%;
   height: auto;
   margin-left: 2.3%;
-  margin-top: 1.9%;
 `;
 
 // ProductContainer: 너비 100%, margin-top 약 5%

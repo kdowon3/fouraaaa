@@ -8,7 +8,7 @@ const FooterContainer = styled.div`
   width: 100%; /* 너비 정확히 맞춤 */
   max-width: 430px;
   aspect-ratio: 402 / 205; /* 원래 402px:205px 비율 유지 */
-  margin-top: 50px; /* 위쪽 마진 줄이기 */
+  margin-top: 100px; /* 위쪽 마진 줄이기 */
   padding: 40px 27px; /* 패딩 조정 */
   display: flex;
   justify-content: space-between;
