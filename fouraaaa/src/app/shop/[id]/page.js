@@ -5,6 +5,7 @@ import Footer from "../../components/common/Footer";
 import DetailNav from "./components/header";
 import InfoTab from "./components/Info";
 import Detail from "./components/detail";
+import SameProducer from "./components/MoreProduct";
 
 
 export default function ShopPage() {
@@ -13,6 +14,7 @@ export default function ShopPage() {
         <DetailNav />
         <InfoTab/>
         <Detail/>
+        <SameProducer/>
       <Footer/>
     </div>
   );
