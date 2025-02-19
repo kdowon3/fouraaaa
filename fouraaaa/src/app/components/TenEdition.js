@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import styled from "styled-components";
 import Image from "next/image";
 
@@ -16,6 +17,7 @@ const Upsection = styled.div`
   display: flex;
   align-items: center;
   margin-bottom: 20px;
+  justify-content: space-between;
 `;
 
 const TitleText = styled.div`
@@ -49,6 +51,14 @@ const ProductsPhoto = styled.div`
   width: 100%;
   aspect-ratio: 1;
   background-color: #ededed;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+const ProductImage = styled(Image)`
+  width: 80%;
+  height: auto;
 `;
 
 const ProductInfo = styled.div`
@@ -76,6 +86,14 @@ const Price = styled.div`
 `;
 
 export default function TenEdition() {
+  const [products, setProducts] = useState([]);
+
+  useEffect(() => {
+    fetch("http://localhost:8000/api/products/")  // Django API 호출 (전체 상품 조회)
+      .then((res) => res.json())
+      .then((data) => setProducts(data));
+  }, []);
+
   return (
     <EditionContainer>
       <Upsection>
@@ -83,13 +101,19 @@ export default function TenEdition() {
         <Arrow src="/images/right-arrow.png" alt="화살표" width={14} height={14} />
       </Upsection>
       <ProductContainer>
-        {[...Array(6)].map((_, index) => (
-          <ProductCards key={index}>
-            <ProductsPhoto />
+        {products.map((product) => (
+          <ProductCards key={product.id}>
+            <ProductsPhoto>
+              {product.image ? (
+                <ProductImage src={product.image} alt={product.name} width={120} height={120} />
+              ) : (
+                <span>이미지 없음</span>
+              )}
+            </ProductsPhoto>
             <ProductInfo>
-              <Company>이능호 세라믹스튜디오</Company>
-              <ProductName>달항아리 세트</ProductName>
-              <Price>79,000</Price>
+              <Company>{product.author}</Company>
+              <ProductName>{product.name}</ProductName>
+              <Price>{product.price ? `${product.price.toLocaleString()} 원` : "가격 미정"}</Price>
             </ProductInfo>
           </ProductCards>
         ))}
