@@ -2,7 +2,11 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation"; 
+import { useState, useEffect } from "react";
 import styled from "styled-components";
+import useProductStore from "@/store";
+
 
 const Background = styled.div`
   width: 100%;
@@ -16,16 +20,17 @@ const Background = styled.div`
 `;
 
 const MoveText =styled.div`
-    font-size: 15px;
-    font-family: "Pretendard";
+  font-size: 15px;
+  font-family: "Pretendard";
+  color: #777777;
 `;
 
 const ProductImg =styled.div`
-    margin-top: 20px;
-    width: 402px;
-    height: 402px;
-    background-color: #000000;
-    padding: 0px 40px;
+  margin-top: 20px;
+  width: 402px;
+  height: 402px;
+  padding: 0px 40px;
+
 `;
 
 const Icon_180= styled(Image)`
@@ -34,6 +39,7 @@ const Icon_180= styled(Image)`
     align-self: flex-end;
     margin-top: 2%;
     margin-right: 8%;
+
 `;
 
 const DetailInfo= styled.div`
@@ -55,6 +61,7 @@ const Divider2=styled.div`
     width: 12px;
     height: 30px;
     background-color: #2C3264;
+
 `;
 
 const Divider3= styled.div`
@@ -67,6 +74,7 @@ const Divider4= styled.div`
     width: 12px;
     height: 30px;
     background-color: #2C3264;
+
 `;
 
 const Divider5=styled.div`
@@ -74,6 +82,7 @@ const Divider5=styled.div`
     height: 30px;
     background-color: #2C3264;
 `;
+
 
 const PriceSection=styled.div`
     width: 209px;
@@ -96,6 +105,7 @@ const SubText=styled.div`
     margin-bottom: 15px;
 `;
 
+
 const Purchase=styled.button`
     padding: 9px 21px;
     background-color: #2C3264;
@@ -109,22 +119,26 @@ const Purchase=styled.button`
     justify-content: center;
 `;
 
+
 const ProductInfo =styled.div`
     width: 100%;
     height: 107px;
     padding: 20px 30px;
 `;
 
+
 const Box = styled.div`
     justify-content: space-between;
     display: flex;
 `;
+
 const InfoBox =styled.div`
     width: 104px;
     height: 39px;
     display: block;
     gap: 8px;
 `;
+
 
 const ProductInfo_Title = styled.div`
     font-family: "Pretendard";
@@ -145,6 +159,7 @@ const MorInfo = styled.div`
     margin-top: 15px;
 `;
 
+
 const Orderguide = styled.div`
     width: 100%;
     height: 300px;
@@ -152,25 +167,28 @@ const Orderguide = styled.div`
     font-family: "Pretendard";
 `;
 
+
 const BigText =styled.div`
-    font-size: 20px;
-    font-weight: bold;
+  font-size: 20px;
+  font-weight: bold;
 `;
 
 const Content = styled.div`
-    font-size: 13px;
-    display: flex;
-    align-items: center; 
-    width: 100%; 
-    margin-top: 10px;
-    cursor: pointer; 
+  font-size: 13px;
+  display: flex;
+  align-items: center; 
+  width: 100%; 
+  margin-top: 10px;
+  cursor: pointer; 
 `;
 
+
 const Arrow = styled(Image)`
-    width: 8px;
+  width: 8px;
     height: 8px;
     margin-left: 10px;
     flex-shrink: 0; 
+
 `;
 
 const Description_Title=styled.div`
@@ -181,19 +199,39 @@ const Description_Title=styled.div`
     font-weight: bold;
     align-self: flex-start;
     margin-left: 20px;
+
 `;
 
 export default function InfoTab() {
+    const router = useRouter();
+    const { product, loading } = useProductStore();
+
     return (
         <Background>
             <MoveText>좌우로 움직여보세요</MoveText>
-            <ProductImg></ProductImg>
-            <Icon_180 src="/images/icon_180.png" width={24} height={24} alt="아이콘"/>
+            <ProductImg>
+                {product?.image_url ? (
+                    <Image 
+                        src={product.image_url} 
+                        alt="상품 이미지" 
+                        width={402} 
+                        height={402} 
+                        style={{ objectFit: "contain" }} 
+                    />
+                ) : (
+                    <span style={{ color: "#fff" }}>이미지 없음</span>
+                )}
+            </ProductImg>
+             <Icon_180 src="/images/icon_180.png" width={24} height={24} alt="아이콘"/>
             <DetailInfo>
-                <Divider1/>남은 수량<Divider2/>4<Divider3/>총 생산량<Divider4/>20<Divider5/>
+                <Divider1/>남은 수량<Divider2/>{product ? product.stock : "불러오는 중..."}<Divider3/>총 생산량<Divider4/>{product?.total_production !== undefined ? product.total_production : "불러오는 중..."}<Divider5/>
             </DetailInfo>
             <PriceSection>
-                <Price>79,000 원</Price>
+            <Price>
+                    {product?.price !== null && product?.price !== undefined
+                        ? `${Number(product.price).toLocaleString()} 원`
+                    : "가격 미정"}
+            </Price>
                 <SubText>재생산 되지 않는 작품입니다.</SubText>
                 <Purchase>구매하기</Purchase>
             </PriceSection>
@@ -201,11 +239,13 @@ export default function InfoTab() {
                 <Box>
                 <InfoBox>
                     <ProductInfo_Title>크기</ProductInfo_Title>
-                    <ProductInfo_Sub>15(W) x 20(H)</ProductInfo_Sub>
+                    <ProductInfo_Sub>
+                        {product ? `${Math.round(product.width)}(W) x ${Math.round(product.height)}(H)` : "불러오는 중..."}
+                    </ProductInfo_Sub>              
                 </InfoBox>
                 <InfoBox>
                     <ProductInfo_Title>소재</ProductInfo_Title>
-                    <ProductInfo_Sub>알루미늄</ProductInfo_Sub>
+                    <ProductInfo_Sub>{product?.material ?? "소재 정보 없음"}</ProductInfo_Sub>
                 </InfoBox>
                 <InfoBox>
                     <ProductInfo_Title>구성품</ProductInfo_Title>
@@ -232,3 +272,4 @@ export default function InfoTab() {
         </Background>
     );
   }
+  

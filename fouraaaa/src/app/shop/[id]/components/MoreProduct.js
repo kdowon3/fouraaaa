@@ -1,112 +1,142 @@
 "use client";
 
-import Link from "next/link";
-import Image from "next/image";
+import dynamic from "next/dynamic";
+import { useState, useEffect } from "react";
 import styled from "styled-components";
+import Image from "next/image";
+import Link from "next/link";
+import { useParams } from "next/navigation";
+import useProductStore from "@/store";
 
-// SoldoutContainer: 최대 너비 430px, 원래 402×333px 비율(≈1.206)을 유지
 const MoreProductContainer = styled.div`
   background-color: #FFFFFF;
   width: 100%;
   max-width: 430px;
-  aspect-ratio: 402 / 333;
-  padding: 7% 5%; /* 30px ≒7%, 20px ≒5% (430px 기준) */
-  display: block;
+  padding: 7% 5%;
   font-family: "Pretendard";
+  overflow-x: auto;
 `;
-
-// Upsection: 컨테이너 너비의 약 90%, 높이는 약 7.2%
 const Upsection = styled.div`
   width: 90%;
   height: 7.2%;
   display: flex;
   align-items: center;
+  justify-content: space-between;
 `;
 
-// TitleText: 글씨 크기는 그대로 사용
 const TitleText = styled.div`
   font-size: 20px;
   font-weight: bold;
   color: #000000;
 `;
 
-// Arrow: 14px, 10px, 8px를 각각 약 3.3%, 2.3%, 1.9%로 변환
 const Arrow = styled(Image)`
   width: 3.3%;
   height: auto;
   margin-left: 2.3%;
 `;
 
-// ProductContainer: 너비 100%, margin-top 약 5%
 const ProductContainer = styled.div`
-  width: 100%;
-  margin-top: 5%;
-  margin-left: auto;
   display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  white-space: nowrap;
+  padding-bottom: 10px;
 `;
 
-// ProductCards: 원래 150px ≒ 37% (150/402)로 설정
 const ProductCards = styled.div`
-  width: 37%;
+  min-width: 150px;
   display: flex;
   flex-direction: column;
-
+  align-items: center;
 `;
 
-// ProductsPhoto: ProductCards 전체 너비, 정사각형 유지
 const ProductsPhoto = styled.div`
   width: 100%;
   aspect-ratio: 1;
   background-color: #EDEDED;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;
 
-// ProductInfo: ProductCards의 너비의 약 83% (125/150)
+const ProductImage = styled(Image)`
+  width: 120px;
+  height: 120px;
+  height: auto;
+  object-fit: contain;
+`;
+
 const ProductInfo = styled.div`
-  width: 83%;
-  display: block;
-  margin-top: 2%;
-  margin-left: 0%;
+  width: 100%;
+  margin-top: 5px;
 `;
 
-// 내부 텍스트들: ProductInfo나 ProductCards의 너비에 맞게 비율로 설정
 const Company = styled.div`
-  width: 100%;
   font-size: 13px;
-  font-family: 'Pretendard';
   font-weight: bold;
   color: #000000;
 `;
+
 const ProductName = styled.div`
-  width: 72%;  /* 약 108px/150px */
   font-size: 14px;
-  font-family: 'Pretendard';
   color: #8A8A8A;
 `;
+
 const Price = styled.div`
-  width: 72%;
   font-size: 14px;
-  font-family: 'Pretendard';
   color: #111111;
-  margin-top: 2%;
+  margin-top: 5px;
 `;
 
+
 export default function SameProducer() {
+  const { product,sameAuthorProducts, loading } = useProductStore(); 
+
+  // ✅ 상태가 정상적으로 업데이트되는지 확인
+  useEffect(() => {
+    console.log("🔍 sameAuthorProducts 상태:", sameAuthorProducts);
+  }, [sameAuthorProducts]);
   return (
     <MoreProductContainer>
-        <Upsection>
-            <TitleText>동일 작가님 다른 작품</TitleText>
-            <Arrow src="/images/right-arrow.png" alt="화살표" width={14} height={14} />
-        </Upsection>
-        <ProductContainer>
-            <ProductCards>
-                <ProductsPhoto />
+      <Upsection>
+        <TitleText>{product?.author}의 다른 작품</TitleText>
+        <Arrow src="/images/right-arrow.png" alt="화살표" width={14} height={14} />
+      </Upsection>
+      <ProductContainer>
+        {loading ? (
+          <p>불러오는 중...</p>
+        ) : sameAuthorProducts.length > 0 ? (
+          sameAuthorProducts.map((product) => (
+            <Link key={product.id} href={`/shop/${product.id}`} passHref>
+              <ProductCards>
+                <ProductsPhoto>
+                  {product.image_url ? (
+                    <ProductImage
+                      src={product.image_url}
+                      alt={product.name}
+                      width={120}
+                      height={120}
+                      unoptimized
+                    />
+                  ) : (
+                    <span>이미지 없음</span>
+                  )}
+                </ProductsPhoto>
                 <ProductInfo>
-                    <Company>이능호 세라믹스튜디오</Company>
-                    <ProductName>달항아리 세트</ProductName>
-                    <Price>79,000</Price>
+                  <Company>{product.author}</Company>
+                  <ProductName>{product.name}</ProductName>
+                  <Price>
+                    {product.price !== null ? `${Number(product.price).toLocaleString()} 원` : "가격 미정"}
+                  </Price>
                 </ProductInfo>
-            </ProductCards>
-        </ProductContainer>
+              </ProductCards>
+            </Link>
+          ))
+        ) : (
+          <p>이 작가님의 다른 작품이 없습니다.</p>
+        )}
+      </ProductContainer>
     </MoreProductContainer>
-  );
+  )
 }

@@ -1,16 +1,23 @@
 "use client";
 
 import { useState } from "react";
+import { uploadImage } from "@/config/uploadImage"; // Firebase Storage 업로드 함수
+import { useRouter } from "next/navigation";
 
 export default function AddProduct() {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     name: "",
     author: "",
     category: "식기",
     material: "도자",
     total_production: 0,
-    order_quantity: 0,
+    width: "",
+    height: "",
+    components: "",
+    price: "",
     description: "",
+    image: null, // 🔥 이미지 파일 추가
   });
 
   const categories = ["식기", "오브제", "아트퍼니처"];
@@ -21,28 +28,33 @@ export default function AddProduct() {
     setFormData({ ...formData, [name]: value });
   };
 
+  const handleFileChange = (e) => {
+    setFormData({ ...formData, image: e.target.files[0] });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    let imageUrl = "";
+    if (formData.image) {
+      imageUrl = await uploadImage(formData.image); // Firebase Storage에 업로드 후 URL 가져오기
+    }
 
     const response = await fetch("http://localhost:8000/api/products/", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(formData),
+      body: JSON.stringify({
+        ...formData,
+        image_url: imageUrl, // ✅ Firebase Storage에서 가져온 이미지 URL 저장
+        components: formData.components.split(","), // ✅ JSON 배열로 변환
+      }),
     });
 
     if (response.ok) {
       alert("상품이 성공적으로 등록되었습니다!");
-      setFormData({
-        name: "",
-        author: "",
-        category: "식기",
-        material: "도자",
-        total_production: 0,
-        order_quantity: 0,
-        description: "",
-      });
+      router.push("/shop"); // 상품 목록 페이지로 이동
     } else {
       alert("상품 등록에 실패했습니다.");
     }
@@ -51,104 +63,49 @@ export default function AddProduct() {
   return (
     <div style={{ padding: "20px", maxWidth: "400px", margin: "auto" }}>
       <h1 style={{ textAlign: "center", marginBottom: "20px" }}>상품 등록</h1>
-      <form
-        onSubmit={handleSubmit}
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "12px", // 🔥 입력 필드 간 간격 추가
-        }}
-      >
+      <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
         <label>상품명:</label>
-        <input
-          type="text"
-          name="name"
-          value={formData.name}
-          onChange={handleChange}
-          required
-          style={{ padding: "8px", borderRadius: "5px", border: "1px solid #ccc" }}
-        />
+        <input type="text" name="name" value={formData.name} onChange={handleChange} required />
 
         <label>작가:</label>
-        <input
-          type="text"
-          name="author"
-          value={formData.author}
-          onChange={handleChange}
-          required
-          style={{ padding: "8px", borderRadius: "5px", border: "1px solid #ccc" }}
-        />
+        <input type="text" name="author" value={formData.author} onChange={handleChange} required />
 
         <label>종류:</label>
-        <select
-          name="category"
-          value={formData.category}
-          onChange={handleChange}
-          style={{ padding: "8px", borderRadius: "5px", border: "1px solid #ccc" }}
-        >
+        <select name="category" value={formData.category} onChange={handleChange}>
           {categories.map((cat) => (
             <option key={cat} value={cat}>{cat}</option>
           ))}
         </select>
 
         <label>재료:</label>
-        <select
-          name="material"
-          value={formData.material}
-          onChange={handleChange}
-          style={{ padding: "8px", borderRadius: "5px", border: "1px solid #ccc" }}
-        >
+        <select name="material" value={formData.material} onChange={handleChange}>
           {materials.map((mat) => (
             <option key={mat} value={mat}>{mat}</option>
           ))}
         </select>
 
         <label>총 생산량:</label>
-        <input
-          type="number"
-          name="total_production"
-          value={formData.total_production}
-          onChange={handleChange}
-          required
-          style={{ padding: "8px", borderRadius: "5px", border: "1px solid #ccc" }}
-        />
+        <input type="number" name="total_production" value={formData.total_production} onChange={handleChange} required />
 
-        <label>주문량:</label>
-        <input
-          type="number"
-          name="order_quantity"
-          value={formData.order_quantity}
-          onChange={handleChange}
-          required
-          style={{ padding: "8px", borderRadius: "5px", border: "1px solid #ccc" }}
-        />
+        <label>가로 (cm):</label>
+        <input type="number" name="width" value={formData.width} onChange={handleChange} required />
+
+        <label>세로 (cm):</label>
+        <input type="number" name="height" value={formData.height} onChange={handleChange} required />
+
+        <label>구성품 (쉼표로 구분):</label>
+        <input type="text" name="components" value={formData.components} onChange={handleChange} required />
+
+        <label>가격:</label>
+        <input type="number" name="price" value={formData.price} onChange={handleChange} required />
 
         <label>설명:</label>
-        <textarea
-          name="description"
-          value={formData.description}
-          onChange={handleChange}
-          style={{
-            padding: "8px",
-            borderRadius: "5px",
-            border: "1px solid #ccc",
-            minHeight: "80px",
-          }}
-        />
+        <textarea name="description" value={formData.description} onChange={handleChange} required />
 
-        <button
-          type="submit"
-          style={{
-            padding: "10px",
-            backgroundColor: "#2C3264",
-            color: "#fff",
-            fontSize: "16px",
-            borderRadius: "5px",
-            cursor: "pointer",
-            border: "none",
-            marginTop: "10px",
-          }}
-        >
+        <label>상품 이미지:</label>
+        <input type="file" accept="image/*" onChange={handleFileChange} required />
+
+        <button type="submit" style={{ padding: "10px", backgroundColor: "#2C3264", color: "#fff" }}>
           등록
         </button>
       </form>
