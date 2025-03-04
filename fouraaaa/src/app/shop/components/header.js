@@ -62,7 +62,7 @@ export default function Header() {
               <Image src="/images/shoppingcart.png" alt="장바구니" width={24} height={24} />
             </Link>
             <Link href="/shop">
-              <Image src="/images/mypage.png" alt="마이페이지" width={24} height={24} />
+              <Image src="/images/mypage.png" alt="마이페이지" width={30} height={30} />
             </Link>
           </IconWrapper>
         </Upsection>
