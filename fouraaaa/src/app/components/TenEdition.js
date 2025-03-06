@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import styled from "styled-components";
 import Image from "next/image";
+import useProductStore from "@/store";
 
 const EditionContainer = styled.div`
   background-color: #ffffff;
@@ -86,13 +87,18 @@ const Price = styled.div`
 `;
 
 export default function TenEdition() {
-  const [products, setProducts] = useState([]);
+  const tenEditionProducts = useProductStore((state) => state.tenEditionProducts);
+  const setTenEditionProducts = useProductStore((state) => state.setTenEditionProducts);
 
   useEffect(() => {
-    fetch("http://localhost:8000/api/products/")  // Django API 호출 (전체 상품 조회)
+    fetch("http://localhost:8000/api/products/") // ✅ 전체 상품을 가져와서 필터링
       .then((res) => res.json())
-      .then((data) => setProducts(data));
-  }, []);
+      .then((data) => {
+        console.log("✅ API 응답 데이터:", data.results || data);
+        setTenEditionProducts(data.results || []); // ✅ 필터링하여 Zustand 상태 업데이트
+      })
+      .catch((error) => console.error("❌ API 호출 오류:", error));
+  }, [setTenEditionProducts]);
 
   return (
     <EditionContainer>
@@ -101,11 +107,11 @@ export default function TenEdition() {
         <Arrow src="/images/right-arrow.png" alt="화살표" width={14} height={14} />
       </Upsection>
       <ProductContainer>
-        {products.map((product) => (
-          <ProductCards key={product.id}>
+      {tenEditionProducts.map((product) => (
+         <ProductCards key={product.id}>
             <ProductsPhoto>
-              {product.image ? (
-                <ProductImage src={product.image} alt={product.name} width={120} height={120} />
+              {product.image_url ? (
+                <ProductImage src={product.image_url} alt={product.name} width={120} height={120} />
               ) : (
                 <span>이미지 없음</span>
               )}

@@ -52,3 +52,5 @@ backend/__pycache__/
 backend/*.pyc
 backend/*.pyo
 backend/*.log
+
+backend/db.sqlite3

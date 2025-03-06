@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import styled from "styled-components";
+import useProductStore from "../../store";
 
 // SoldoutContainer: 최대 너비 430px, 원래 402×333px 비율(≈1.206) 유지
 const SoldoutContainer = styled.div`
@@ -104,13 +105,19 @@ const Price = styled.div`
 `;
 
 export default function Soldout() {
-  const [soldoutProducts, setSoldoutProducts] = useState([]);
+  const soldoutProducts = useProductStore((state) => state.soldoutProducts);
+  const setSoldoutProducts = useProductStore((state) => state.setSoldoutProducts);
 
   useEffect(() => {
-    fetch("http://localhost:8000/api/products/")  // Django API 호출
+    fetch("http://localhost:8000/api/products/") // ✅ 전체 상품을 가져와서 필터링
       .then((res) => res.json())
-      .then((data) => setSoldoutProducts(data));
-  }, []);
+      .then((data) => {
+        console.log("✅ API 응답 데이터:", data.results || data);
+        setSoldoutProducts(data.results || []); // ✅ 필터링하여 Zustand 상태 업데이트
+      })
+      .catch((error) => console.error("❌ API 호출 오류:", error));
+  }, [setSoldoutProducts]);
+
 
   return (
     <SoldoutContainer>
@@ -119,11 +126,11 @@ export default function Soldout() {
         <Arrow src="/images/right-arrow.png" alt="화살표" width={14} height={14} />
       </Upsection>
       <ProductContainer>
-        {soldoutProducts.map((product) => (
+        {soldoutProducts?.map((product) => (
           <ProductCards key={product.id}>
             <ProductsPhoto>
-              {product.image ? (
-                <ProductImage src={product.image} alt={product.name} width={120} height={120} />
+              {product.image_url ? (
+                <ProductImage src={product.image_url} alt={product.name} width={120} height={120} />
               ) : (
                 <span>이미지 없음</span>
               )}

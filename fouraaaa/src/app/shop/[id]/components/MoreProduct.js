@@ -1,12 +1,13 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import styled from "styled-components";
 import Image from "next/image";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import useProductStore from "@/store";
+import { shallow } from "zustand/shallow";
 
 const MoreProductContainer = styled.div`
   background-color: #FFFFFF;
@@ -89,14 +90,27 @@ const Price = styled.div`
   margin-top: 5px;
 `;
 
-
 export default function SameProducer() {
-  const { product,sameAuthorProducts, loading } = useProductStore(); 
+  const store = useProductStore();
 
-  // ✅ 상태가 정상적으로 업데이트되는지 확인
+  const { product, sameAuthorProducts, loading, setLoading } = useMemo(() => ({
+    product: store.product,
+    sameAuthorProducts: store.sameAuthorProducts,
+    loading: store.loading,
+    setLoading: store.setLoading,
+  }), [store.product, store.sameAuthorProducts, store.loading]);
+
   useEffect(() => {
-    console.log("🔍 sameAuthorProducts 상태:", sameAuthorProducts);
-  }, [sameAuthorProducts]);
+    setLoading(true);
+    fetch(`http://localhost:8000/api/products/${product?.id}/same-author/`)
+      .then((res) => res.json())
+      .then((data) => {
+        console.log("✅ 같은 작가 상품 데이터:", data);
+        useProductStore.getState().setSameAuthorProducts(data);
+      })
+      .finally(() => setLoading(false));
+  }, [product?.id]);
+
   return (
     <MoreProductContainer>
       <Upsection>
@@ -106,7 +120,7 @@ export default function SameProducer() {
       <ProductContainer>
         {loading ? (
           <p>불러오는 중...</p>
-        ) : sameAuthorProducts.length > 0 ? (
+        ) : sameAuthorProducts && sameAuthorProducts.length > 0 ? (
           sameAuthorProducts.map((product) => (
             <Link key={product.id} href={`/shop/${product.id}`} passHref>
               <ProductCards>
