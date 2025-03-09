@@ -67,3 +67,16 @@ def save(self, *args, **kwargs):
 
     def __str__(self):
         return f"{self.name} - {self.author} ({self.category}/{self.material}) - {self.price}원"
+
+
+class Banner(models.Model):
+    title = models.CharField(max_length=100, help_text="배너 제목")
+    image_url = models.CharField(max_length=500, help_text="Firebase 이미지 URL")
+    order = models.PositiveIntegerField(default=0, help_text="배너 정렬 순서")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["order"]
+
+    def __str__(self):
+        return self.title

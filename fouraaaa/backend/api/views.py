@@ -8,6 +8,10 @@ from rest_framework import status
 from .models import Product
 from .serializers import ProductSerializer
 from rest_framework.pagination import PageNumberPagination
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+import json
+from .models import Banner
 
 class ProductPagination(PageNumberPagination):
     page_size = 8  # ✅ 한 페이지에 8개씩
@@ -80,3 +84,34 @@ class ProductViewSet(ModelViewSet):
         }
 
         return Response(response_data)
+
+
+@csrf_exempt
+def add_banner(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body.decode("utf-8"))  # ✅ 인코딩 문제 방지
+            title = data.get("title")
+            order = data.get("order", 0)
+            image_url = data.get("image_url")  # 🔥 Firebase Storage URL 받기
+
+            if not title or not image_url:
+                return JsonResponse({"error": "제목과 이미지 URL을 모두 입력하세요."}, status=400)
+
+            # ✅ 배너 저장
+            banner = Banner.objects.create(title=title, order=order, image_url=image_url)
+
+            return JsonResponse({"message": "배너가 등록되었습니다.", "banner_id": banner.id}, status=201)
+
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "잘못된 JSON 데이터입니다."}, status=400)
+        except Exception as e:
+            return JsonResponse({"error": f"서버 오류: {str(e)}"}, status=500)
+
+    return JsonResponse({"error": "POST 요청만 허용됩니다."}, status=405)
+
+
+def get_banners(request):
+    banners = Banner.objects.all().order_by("-id")  # 최신 배너부터 정렬
+    banner_list = [{"id": banner.id, "image_url": banner.image_url} for banner in banners]
+    return JsonResponse({"banners": banner_list})

@@ -298,7 +298,7 @@ export default function Products() {
 
       {/* 🔥 재료 DetailNav */}
       <DetailNav isVisible={activeFilter === "material"}>
-        <Divider3 />
+        <Divider1 />
         <DetailNavItem selected={selectedFilters.material === "도자"} onClick={() => handleMaterialSelect("도자")}>
           도자
         </DetailNavItem>
@@ -310,7 +310,7 @@ export default function Products() {
         <DetailNavItem selected={selectedFilters.material === "금속"} onClick={() => handleMaterialSelect("금속")}>
           금속
         </DetailNavItem>
-        <Divider4 />
+        <Divider2 />
       </DetailNav>
       <ProductContainer>
         {products.map((product) => (

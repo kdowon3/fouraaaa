@@ -1,7 +1,5 @@
-import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { app } from "./firebase"; // Firebase 설정 가져오기
-
-const storage = getStorage(app);
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { storage } from "./firebase"; // ✅ Firebase Storage 가져오기
 
 export async function uploadImage(file) {
   if (!file) return null;
